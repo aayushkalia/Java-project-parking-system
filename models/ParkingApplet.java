@@ -1,15 +1,15 @@
-// ParkingApplet.java
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
 
 public class ParkingApplet extends Applet implements ActionListener {
+
     private CardLayout cards;
     private Panel mainPanel;
     private Panel navBar;
     private Button btnHome, btnDashboard, btnSlots, btnEntry, btnExit, btnStaff, btnReports;
 
-    // panels (one per page)
+    private HomePanel homePanel;
     private DashboardPanel dashboardPanel;
     private SlotPanel slotPanel;
     private EntryPanel entryPanel;
@@ -18,102 +18,215 @@ public class ParkingApplet extends Applet implements ActionListener {
     private Panel reportsPanel;
 
     public void init() {
-        setLayout(new BorderLayout());
-        setBackground(new Color(240,240,240));
+        this.setLayout(new BorderLayout());
+        this.setBackground(new Color(240, 240, 240));
 
-        // NAVBAR
-        navBar = new Panel(new FlowLayout(FlowLayout.LEFT,8,6));
-        navBar.setBackground(new Color(20,120,120));
-        btnHome = makeButton("Home");
-        btnDashboard = makeButton("Dashboard");
-        btnSlots = makeButton("Slots");
-        btnEntry = makeButton("Entry");
-        btnExit = makeButton("Exit");
-        btnStaff = makeButton("Staff");
-        btnReports = makeButton("Reports");
+        this.navBar = new Panel(new FlowLayout(FlowLayout.LEFT, 10, 8));
+        this.navBar.setBackground(new Color(38, 50, 56));
 
-        navBar.add(btnHome); navBar.add(btnDashboard); navBar.add(btnSlots);
-        navBar.add(btnEntry); navBar.add(btnExit); navBar.add(btnStaff);
-        navBar.add(btnReports);
+        this.btnHome = this.makeButton("Home");
+        this.btnDashboard = this.makeButton("Dashboard");
+        this.btnSlots = this.makeButton("Slots");
+        this.btnEntry = this.makeButton("Entry");
+        this.btnExit = this.makeButton("Exit");
+        this.btnStaff = this.makeButton("Staff");
+        this.btnReports = this.makeButton("Reports");
 
-        add(navBar, BorderLayout.NORTH);
+        this.navBar.add(this.btnHome);
+        this.navBar.add(this.btnDashboard);
+        this.navBar.add(this.btnSlots);
+        this.navBar.add(this.btnEntry);
+        this.navBar.add(this.btnExit);
+        this.navBar.add(this.btnStaff);
+        this.navBar.add(this.btnReports);
 
-        // MAIN CARDS
-        cards = new CardLayout();
-        mainPanel = new Panel(cards);
+        this.add(this.navBar, BorderLayout.NORTH);
 
-        // ensure slots seeded
+        this.cards = new CardLayout();
+        this.mainPanel = new Panel(this.cards);
+
         SlotManager.seedSlots();
 
-        dashboardPanel = new DashboardPanel();
-        slotPanel = new SlotPanel();
-        entryPanel = new EntryPanel();
-        exitPanel = new ExitPanel();
-        staffPanel = new StaffPanel();
-        reportsPanel = buildReportsPanel();
+        this.homePanel = new HomePanel(this);
+        this.dashboardPanel = new DashboardPanel(this);
+        this.slotPanel = new SlotPanel(this);
+        this.entryPanel = new EntryPanel(this);
+        this.exitPanel = new ExitPanel(this);
+        this.staffPanel = new StaffPanel();
+        this.reportsPanel = this.buildReportsPanel();
 
-        mainPanel.add(dashboardPanel, "HOME");
-        mainPanel.add(dashboardPanel, "DASH"); // same dashboard
-        mainPanel.add(slotPanel, "SLOTS");
-        mainPanel.add(entryPanel, "ENTRY");
-        mainPanel.add(exitPanel, "EXIT");
-        mainPanel.add(staffPanel, "STAFF");
-        mainPanel.add(reportsPanel, "REPORTS");
+        this.mainPanel.add(this.homePanel, "HOME");
+        this.mainPanel.add(this.dashboardPanel, "DASH");
+        this.mainPanel.add(this.slotPanel, "SLOTS");
+        this.mainPanel.add(this.entryPanel, "ENTRY");
+        this.mainPanel.add(this.exitPanel, "EXIT");
+        this.mainPanel.add(this.staffPanel, "STAFF");
+        this.mainPanel.add(this.reportsPanel, "REPORTS");
 
-        add(mainPanel, BorderLayout.CENTER);
+        this.add(this.mainPanel, BorderLayout.CENTER);
 
-        // show home
-        cards.show(mainPanel, "HOME");
+        this.cards.show(this.mainPanel, "HOME");
     }
 
     private Button makeButton(String text) {
         Button b = new Button(text);
-        b.setFont(new Font("Arial", Font.PLAIN, 12));
-        b.setBackground(Color.white);
-        b.setForeground(new Color(10,90,90));
+        b.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        b.setBackground(new Color(255, 255, 255));
+        b.setForeground(new Color(38, 50, 56));
         b.addActionListener(this);
         return b;
     }
 
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
-        if (src == btnHome || src == btnDashboard) {
-            dashboardPanel.refresh();
-            cards.show(mainPanel, "HOME");
-        } else if (src == btnSlots) {
-            slotPanel.refresh();
-            cards.show(mainPanel, "SLOTS");
-        } else if (src == btnEntry) {
-            cards.show(mainPanel, "ENTRY");
-        } else if (src == btnExit) {
-            cards.show(mainPanel, "EXIT");
-        } else if (src == btnStaff) {
-            cards.show(mainPanel, "STAFF");
-        } else if (src == btnReports) {
-            refreshReports();
-            cards.show(mainPanel, "REPORTS");
+        if (src == this.btnHome) {
+            this.switchView("HOME");
+        } else if (src == this.btnDashboard) {
+            this.switchView("DASH");
+        } else if (src == this.btnSlots) {
+            this.switchView("SLOTS");
+        } else if (src == this.btnEntry) {
+            this.switchView("ENTRY");
+        } else if (src == this.btnExit) {
+            this.switchView("EXIT");
+        } else if (src == this.btnStaff) {
+            if (showPasswordDialog()) {
+                 this.switchView("STAFF");
+            }
+        } else if (src == this.btnReports) {
+            this.refreshReports();
+            this.switchView("REPORTS");
         }
     }
 
+    public void switchView(String name) {
+        if (name.equals("HOME")) {
+            this.cards.show(this.mainPanel, "HOME");
+        } else if (name.equals("DASH")) {
+            if (this.dashboardPanel != null) this.dashboardPanel.refresh();
+            this.cards.show(this.mainPanel, "DASH");
+        } else if (name.equals("SLOTS")) {
+            if (this.slotPanel != null) this.slotPanel.refresh();
+            this.cards.show(this.mainPanel, "SLOTS");
+        } else {
+            this.cards.show(this.mainPanel, name);
+        }
+    }
+
+    private boolean showPasswordDialog() {
+        final String CORRECT_PASSWORD = "admin123";
+        
+        Frame f = new Frame();
+        final Dialog d = new Dialog(f, "Staff Login Required", true);
+        d.setLayout(new BorderLayout(15, 15));
+        d.setSize(320, 160);
+        d.setBackground(new Color(245, 245, 245));
+        
+        Panel inputPanel = new Panel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
+        c.gridx = 0; c.gridy = 0;
+        
+        Label lbl = new Label("Password:");
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        inputPanel.add(lbl, c);
+        
+        c.gridx = 1;
+        final TextField passField = new TextField(15);
+        passField.setEchoChar('*'); 
+        inputPanel.add(passField, c);
+        
+        d.add(inputPanel, BorderLayout.CENTER);
+        
+        Panel btnPanel = new Panel(new FlowLayout(FlowLayout.CENTER));
+        Button loginBtn = new Button("Login");
+        loginBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        loginBtn.setBackground(new Color(33, 150, 243));
+        loginBtn.setForeground(Color.WHITE);
+        
+        final boolean[] isAuthenticated = {false}; 
+        
+        ActionListener loginAction = e -> {
+            if (passField.getText().equals(CORRECT_PASSWORD)) {
+                isAuthenticated[0] = true;
+                d.dispose();
+            } else {
+                passField.setText("");
+                passField.requestFocus();
+            }
+        };
+        
+        loginBtn.addActionListener(loginAction);
+        passField.addActionListener(loginAction);
+
+        btnPanel.add(loginBtn);
+        d.add(btnPanel, BorderLayout.SOUTH);
+        
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int x = (screenSize.width - d.getWidth()) / 2;
+        int y = (screenSize.height - d.getHeight()) / 2;
+        d.setLocation(x, y);
+
+        d.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                d.dispose();
+            }
+        });
+
+        d.setVisible(true); 
+        f.dispose();
+        
+        return isAuthenticated[0];
+    }
+
     private Panel buildReportsPanel() {
-        Panel p = new Panel(new BorderLayout());
-        p.setBackground(new Color(250,250,250));
-        Label title = new Label("Reports", Label.CENTER); title.setFont(new Font("Arial", Font.BOLD, 18));
+        Panel p = new Panel(new BorderLayout(20, 20));
+        p.setBackground(new Color(255, 255, 255));
+
+        Label title = new Label("System Reports", Label.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        title.setForeground(new Color(38, 50, 56));
         p.add(title, BorderLayout.NORTH);
 
-        Panel center = new Panel(new GridLayout(3,1));
-        center.add(new Label("Total slots: " + SlotManager.totalSlots()));
-        center.add(new Label("Occupied: " + SlotManager.occupiedSlots()));
-        center.add(new Label("Revenue collected: ₹" + (int)SlotManager.getRevenue()));
-        p.add(center, BorderLayout.CENTER);
+        Panel center = new Panel(new GridLayout(3, 1, 10, 10));
+        center.setBackground(new Color(255, 255, 255));
+
+        Font dataFont = new Font("Segoe UI", Font.PLAIN, 18);
+
+        int total = 0, occupied = 0;
+        double revenue = 0.0;
+        try {
+            total = SlotManager.totalSlots();
+            occupied = SlotManager.occupiedSlots();
+            revenue = SlotManager.getRevenue();
+        } catch (NullPointerException ignored) {}
+
+        Label totalLbl = new Label("Total slots: " + total, Label.CENTER);
+        totalLbl.setFont(dataFont);
+
+        Label occupiedLbl = new Label("Occupied: " + occupied, Label.CENTER);
+        occupiedLbl.setFont(dataFont);
+
+        Label revenueLbl = new Label("Revenue collected: Rs" + (int) revenue, Label.CENTER);
+        revenueLbl.setFont(dataFont);
+        revenueLbl.setForeground(new Color(56, 142, 60));
+
+        center.add(totalLbl);
+        center.add(occupiedLbl);
+        center.add(revenueLbl);
+
+        Panel padding = new Panel(new GridBagLayout());
+        padding.setBackground(new Color(250, 250, 250));
+        padding.add(center);
+
+        p.add(padding, BorderLayout.CENTER);
         return p;
     }
 
-    private void refreshReports() {
-        // rebuild reports panel quickly by replacing card (simpler: just update dashboard and reports)
-        // For simplicity, recreate and replace REPORTS card
-        mainPanel.remove(mainPanel.getComponentCount()-1); // last assumed reports
-        Panel reportsPanel = buildReportsPanel();
-        mainPanel.add(reportsPanel, "REPORTS");
+    public void refreshReports() {
+        this.mainPanel.remove(this.reportsPanel);
+        this.reportsPanel = this.buildReportsPanel();
+        this.mainPanel.add(this.reportsPanel, "REPORTS");
+        this.mainPanel.validate();
     }
 }

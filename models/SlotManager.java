@@ -7,13 +7,23 @@ public class SlotManager {
     private static HashMap<String, Vehicle> vehicles = new HashMap<String, Vehicle>(); // by vehicleNo
     private static ArrayList<String> staff = new ArrayList<String>();
     private static double revenue = 0.0;
-
     public static void seedSlots() {
         if (!slots.isEmpty()) return;
+       
         for (int i = 1; i <= 10; i++) slots.add(new Slot(i, "2W"));
         for (int i = 11; i <= 30; i++) slots.add(new Slot(i, "4W"));
     }
-
+public static double getParkingPrice(String type) {
+    if (type.equals("2W")) {
+       
+        return 20.0;
+    } else if (type.equals("4W")) {
+       
+        return 40.0;
+    }
+    
+    return 0.0;
+}
     public static ArrayList<Slot> getSlots() { return slots; }
 
     public static int findAndAssignSlot(String type, String vehicleNo) {
@@ -36,13 +46,10 @@ public class SlotManager {
         for (Slot s : slots) if (s.getId() == slotId) { found = s; break; }
         if (found == null) return -1;
 
-        // billing rule: flat price per entry (as requested)
         double amount = v.getType().equals("2W") ? 10.0 : 20.0;
 
-        // update revenue
+        
         revenue += amount;
-
-        // free slot and remove vehicle
         found.free();
         vehicles.remove(vehicleNo);
 
