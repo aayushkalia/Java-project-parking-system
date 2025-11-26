@@ -8,17 +8,14 @@ public class SlotManager {
     private static ArrayList<String> staff = new ArrayList<String>();
     private static double revenue = 0.0;
 
-    // initialize seed slots (call once)
     public static void seedSlots() {
         if (!slots.isEmpty()) return;
-        // Example: 10 two-wheelers + 20 four-wheelers
         for (int i = 1; i <= 10; i++) slots.add(new Slot(i, "2W"));
         for (int i = 11; i <= 30; i++) slots.add(new Slot(i, "4W"));
     }
 
     public static ArrayList<Slot> getSlots() { return slots; }
 
-    // find free slot of type, return id or -1
     public static int findAndAssignSlot(String type, String vehicleNo) {
         for (Slot s : slots) {
             if (!s.isOccupied() && s.getType().equals(type)) {
@@ -31,7 +28,6 @@ public class SlotManager {
         return -1;
     }
 
-    // free slot by vehicle number, return bill amount or -1 if not found
     public static double exitVehicle(String vehicleNo) {
         Vehicle v = vehicles.get(vehicleNo);
         if (v == null) return -1;
