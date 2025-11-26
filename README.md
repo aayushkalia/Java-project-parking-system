@@ -64,21 +64,21 @@ Applets only run on older Java versions (Java 8 recommended).
 ```bash
 javac *.java
 
-3. Run using appletviewer
+### **3. Run using appletviewer**
 appletviewer ParkingApplet.html
 
-📦 Object-Oriented Concepts Used
-Encapsulation:
+## 📦 Object-Oriented Concepts Used:
+1. **Encapsulation**:
 Private fields for Slot, Vehicle, Staff with getters/setters.
 
-Abstraction:
+2. **Abstraction**:
 SlotManager handles internal logic — UI interacts via methods.
 
-Inheritance:
+3. **Inheritance**:
 Panels extend Java AWT Panel/Applet classes.
 
-Polymorphism:
+4. **Polymorphism**:
 Different ActionListeners override actionPerformed().
 
-Modularity:
+5. **Modularity**:
 Each UI screen is a separate Java file.
