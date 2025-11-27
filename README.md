@@ -56,29 +56,28 @@ This project simulates real-world parking operations such as tracking slots, veh
 ---
 
 ## ▶️ How to Run
+1️⃣ Ensure JDK 8 is Installed
+- Java Applets require older Java versions (JDK 8 recommended).
 
-### **1. Make sure you use JDK 8**
-Applets only run on older Java versions (Java 8 recommended).
+2️⃣ Compile All Files
+- javac *.java
 
-### **2. Compile all files**
-```bash
-javac *.java
+3️⃣ Run Using appletviewer
+- appletviewer ParkingApplet.html
 
-### **3. Run using appletviewer**
-appletviewer ParkingApplet.html
+## 📦 Object-Oriented Concepts Used
 
-## 📦 Object-Oriented Concepts Used:
 1. **Encapsulation**:
-Private fields for Slot, Vehicle, Staff with getters/setters.
+Private fields in Slot, Vehicle, Staff classes with proper getters & setters.
 
 2. **Abstraction**:
-SlotManager handles internal logic — UI interacts via methods.
+SlotManager hides internal working and exposes only necessary methods to UI.
 
 3. **Inheritance**:
-Panels extend Java AWT Panel/Applet classes.
+UI panels extend AWT classes like Panel and Applet.
 
 4. **Polymorphism**:
-Different ActionListeners override actionPerformed().
+Multiple ActionListener implementations override actionPerformed() differently.
 
 5. **Modularity**:
-Each UI screen is a separate Java file.
+Each UI screen and logic component is separated into different .java files.
