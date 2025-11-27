@@ -65,6 +65,8 @@ This project simulates real-world parking operations such as tracking slots, veh
 3️⃣ Run Using appletviewer
 - appletviewer ParkingApplet.html
 
+---
+
 ## 📦 Object-Oriented Concepts Used
 
 1. **Encapsulation**:
