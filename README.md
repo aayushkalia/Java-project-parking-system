@@ -5,7 +5,7 @@ This project simulates real-world parking operations such as tracking slots, veh
 
 ---
 
-## 🚀 Features
+## Features
 
 - **Dashboard Screen**
   - Shows total slots, occupied slots, free slots, and total revenue.
@@ -57,7 +57,7 @@ This project simulates real-world parking operations such as tracking slots, veh
 
 ## ▶️ How to Run
 1️⃣ Ensure JDK 8 is Installed
-- Java Applets require older Java versions (JDK 8 recommended).
+- Java Applets require older Java versions , this project has been tested for JDK 8 and it runs completely fine with java 8. So, JDK 8 is recommended. 
 
 2️⃣ Compile All Files
 - javac *.java
