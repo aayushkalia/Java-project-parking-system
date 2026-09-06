@@ -1,6 +1,6 @@
 public class Slot {
     private final int id;
-    private final String type; // "2W" or "4W"
+    private final String type; 
     private boolean occupied;
     private String vehicleNo;
     private long entryTime;
