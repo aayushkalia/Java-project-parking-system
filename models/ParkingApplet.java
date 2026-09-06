@@ -3,18 +3,13 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class ParkingApplet extends Applet implements ActionListener {
-
     private CardLayout cards;
     private Panel mainPanel;
     private Panel navBar;
     private Button btnHome, btnDashboard, btnSlots, btnEntry, btnExit, btnStaff, btnReports;
 
-    private HomePanel homePanel;
     private DashboardPanel dashboardPanel;
     private SlotPanel slotPanel;
-    private EntryPanel entryPanel;
-    private ExitPanel exitPanel;
-    private StaffPanel staffPanel;
     private Panel reportsPanel;
 
     public void init() {
@@ -47,24 +42,23 @@ public class ParkingApplet extends Applet implements ActionListener {
 
         SlotManager.seedSlots();
 
-        this.homePanel = new HomePanel(this);
+        HomePanel homePanel = new HomePanel(this);
         this.dashboardPanel = new DashboardPanel(this);
         this.slotPanel = new SlotPanel(this);
-        this.entryPanel = new EntryPanel(this);
-        this.exitPanel = new ExitPanel(this);
-        this.staffPanel = new StaffPanel();
+        EntryPanel entryPanel = new EntryPanel(this);
+        ExitPanel exitPanel = new ExitPanel(this);
+        StaffPanel staffPanel = new StaffPanel();
         this.reportsPanel = this.buildReportsPanel();
 
-        this.mainPanel.add(this.homePanel, "HOME");
+        this.mainPanel.add(homePanel, "HOME");
         this.mainPanel.add(this.dashboardPanel, "DASH");
         this.mainPanel.add(this.slotPanel, "SLOTS");
-        this.mainPanel.add(this.entryPanel, "ENTRY");
-        this.mainPanel.add(this.exitPanel, "EXIT");
-        this.mainPanel.add(this.staffPanel, "STAFF");
+        this.mainPanel.add(entryPanel, "ENTRY");
+        this.mainPanel.add(exitPanel, "EXIT");
+        this.mainPanel.add(staffPanel, "STAFF");
         this.mainPanel.add(this.reportsPanel, "REPORTS");
 
         this.add(this.mainPanel, BorderLayout.CENTER);
-
         this.cards.show(this.mainPanel, "HOME");
     }
 
@@ -79,45 +73,33 @@ public class ParkingApplet extends Applet implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         Object src = e.getSource();
-        if (src == this.btnHome) {
-            this.switchView("HOME");
-        } else if (src == this.btnDashboard) {
-            this.switchView("DASH");
-        } else if (src == this.btnSlots) {
-            this.switchView("SLOTS");
-        } else if (src == this.btnEntry) {
-            this.switchView("ENTRY");
-        } else if (src == this.btnExit) {
-            this.switchView("EXIT");
-        } else if (src == this.btnStaff) {
-            if (showPasswordDialog()) {
-                 this.switchView("STAFF");
-            }
-        } else if (src == this.btnReports) {
+        if (src == this.btnHome) this.switchView("HOME");
+        else if (src == this.btnDashboard) this.switchView("DASH");
+        else if (src == this.btnSlots) this.switchView("SLOTS");
+        else if (src == this.btnEntry) this.switchView("ENTRY");
+        else if (src == this.btnExit) this.switchView("EXIT");
+        else if (src == this.btnStaff) {
+            if (showPasswordDialog()) this.switchView("STAFF");
+        } 
+        else if (src == this.btnReports) {
             this.refreshReports();
             this.switchView("REPORTS");
         }
     }
 
     public void switchView(String name) {
-        if (name.equals("HOME")) {
-            this.cards.show(this.mainPanel, "HOME");
-        } else if (name.equals("DASH")) {
-            if (this.dashboardPanel != null) this.dashboardPanel.refresh();
-            this.cards.show(this.mainPanel, "DASH");
-        } else if (name.equals("SLOTS")) {
-            if (this.slotPanel != null) this.slotPanel.refresh();
-            this.cards.show(this.mainPanel, "SLOTS");
-        } else {
-            this.cards.show(this.mainPanel, name);
+        if ("DASH".equals(name) && this.dashboardPanel != null) {
+            this.dashboardPanel.refresh();
+        } else if ("SLOTS".equals(name) && this.slotPanel != null) {
+            this.slotPanel.refresh();
         }
+        this.cards.show(this.mainPanel, name);
     }
 
     private boolean showPasswordDialog() {
         final String CORRECT_PASSWORD = "admin123";
-        
         Frame f = new Frame();
-        final Dialog d = new Dialog(f, "Staff Login Required", true);
+        Dialog d = new Dialog(f, "Staff Login Required", true);
         d.setLayout(new BorderLayout(15, 15));
         d.setSize(320, 160);
         d.setBackground(new Color(245, 245, 245));
@@ -132,10 +114,9 @@ public class ParkingApplet extends Applet implements ActionListener {
         inputPanel.add(lbl, c);
         
         c.gridx = 1;
-        final TextField passField = new TextField(15);
+        TextField passField = new TextField(15);
         passField.setEchoChar('*'); 
         inputPanel.add(passField, c);
-        
         d.add(inputPanel, BorderLayout.CENTER);
         
         Panel btnPanel = new Panel(new FlowLayout(FlowLayout.CENTER));
@@ -158,19 +139,13 @@ public class ParkingApplet extends Applet implements ActionListener {
         
         loginBtn.addActionListener(loginAction);
         passField.addActionListener(loginAction);
-
         btnPanel.add(loginBtn);
         d.add(btnPanel, BorderLayout.SOUTH);
         
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screenSize.width - d.getWidth()) / 2;
-        int y = (screenSize.height - d.getHeight()) / 2;
-        d.setLocation(x, y);
-
+        d.setLocation((screenSize.width - d.getWidth()) / 2, (screenSize.height - d.getHeight()) / 2);
         d.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                d.dispose();
-            }
+            public void windowClosing(WindowEvent e) { d.dispose(); }
         });
 
         d.setVisible(true); 
@@ -190,24 +165,13 @@ public class ParkingApplet extends Applet implements ActionListener {
 
         Panel center = new Panel(new GridLayout(3, 1, 10, 10));
         center.setBackground(new Color(255, 255, 255));
-
         Font dataFont = new Font("Segoe UI", Font.PLAIN, 18);
 
-        int total = 0, occupied = 0;
-        double revenue = 0.0;
-        try {
-            total = SlotManager.totalSlots();
-            occupied = SlotManager.occupiedSlots();
-            revenue = SlotManager.getRevenue();
-        } catch (NullPointerException ignored) {}
-
-        Label totalLbl = new Label("Total slots: " + total, Label.CENTER);
+        Label totalLbl = new Label("Total slots: " + SlotManager.totalSlots(), Label.CENTER);
         totalLbl.setFont(dataFont);
-
-        Label occupiedLbl = new Label("Occupied: " + occupied, Label.CENTER);
+        Label occupiedLbl = new Label("Occupied: " + SlotManager.occupiedSlots(), Label.CENTER);
         occupiedLbl.setFont(dataFont);
-
-        Label revenueLbl = new Label("Revenue collected: Rs" + (int) revenue, Label.CENTER);
+        Label revenueLbl = new Label("Revenue collected: Rs" + (int) SlotManager.getRevenue(), Label.CENTER);
         revenueLbl.setFont(dataFont);
         revenueLbl.setForeground(new Color(56, 142, 60));
 
