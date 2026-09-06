@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.event.*;
 
 public class HomePanel extends Panel {
 
@@ -29,35 +28,29 @@ public class HomePanel extends Panel {
 
         Button[] buttons = {dashBtn, slotsBtn, entryBtn, exitBtn, staffBtn, reportsBtn};
 
-        for (final Button b : buttons) {
-            b.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    String label = b.getLabel();
-                    if (label.equals("Dashboard")) applet.switchView("DASH");
-                    else if (label.equals("Slots")) applet.switchView("SLOTS");
-                    else if (label.equals("Entry")) applet.switchView("ENTRY");
-                    else if (label.equals("Exit")) applet.switchView("EXIT");
-                    else if (label.equals("Staff")) applet.switchView("STAFF");
-                    else if (label.equals("Reports")) {
+        for (Button b : buttons) {
+            b.addActionListener(e -> {
+                String label = b.getLabel();
+                switch (label) {
+                    case "Dashboard": applet.switchView("DASH"); break;
+                    case "Slots": applet.switchView("SLOTS"); break;
+                    case "Entry": applet.switchView("ENTRY"); break;
+                    case "Exit": applet.switchView("EXIT"); break;
+                    case "Staff": applet.switchView("STAFF"); break;
+                    case "Reports":
                         applet.refreshReports();
                         applet.switchView("REPORTS");
-                    }
+                        break;
                 }
             });
         }
 
-        c.gridx = 0; c.gridy = 2;
-        this.add(dashBtn, c);
-        c.gridx = 1;
-        this.add(slotsBtn, c);
-        c.gridx = 0; c.gridy = 3;
-        this.add(entryBtn, c);
-        c.gridx = 1;
-        this.add(exitBtn, c);
-        c.gridx = 0; c.gridy = 4;
-        this.add(staffBtn, c);
-        c.gridx = 1;
-        this.add(reportsBtn, c);
+        c.gridx = 0; c.gridy = 2; this.add(dashBtn, c);
+        c.gridx = 1; this.add(slotsBtn, c);
+        c.gridx = 0; c.gridy = 3; this.add(entryBtn, c);
+        c.gridx = 1; this.add(exitBtn, c);
+        c.gridx = 0; c.gridy = 4; this.add(staffBtn, c);
+        c.gridx = 1; this.add(reportsBtn, c);
     }
 
     private Button createTileButton(String text, Color bg) {
