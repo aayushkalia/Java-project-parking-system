@@ -1,9 +1,8 @@
-// Vehicle.java
 public class Vehicle {
-    private String vehicleNo;
-    private String type; // "2W" or "4W"
-    private long entryTime; // millis
-    private int slotId;
+    private final String vehicleNo;
+    private final String type; 
+    private final long entryTime; 
+    private final int slotId;
 
     public Vehicle(String vehicleNo, String type, int slotId) {
         this.vehicleNo = vehicleNo;
