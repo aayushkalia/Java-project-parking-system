@@ -1,9 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 
 public class SlotPanel extends Panel {
-    private Panel grid;
+    private final Panel grid;
     private final ParkingApplet controller; 
 
     public SlotPanel(ParkingApplet controller) {
@@ -38,52 +37,43 @@ public class SlotPanel extends Panel {
         grid.removeAll();
         
         try {
-            for (final Slot s : SlotManager.getSlots()) {
-                
+            for (Slot s : SlotManager.getSlots()) {
                 String buttonText;
-
                 double price = SlotManager.getParkingPrice(s.getType()); 
                 
                 if (s.isOccupied()) {
-                   
                     buttonText = "S" + s.getId() + " | " + s.getVehicleNo() + " (Rs " + (int)price + ")";
                 } else {
-                   
                     buttonText = "S" + s.getId() + " (" + s.getType() + ") Rs " + (int)price;
                 }
                 
-                final Button b = new Button(buttonText);
-                
-                // Adjust font size slightly if text is long
+                Button b = new Button(buttonText);
                 b.setFont(new Font("Segoe UI", Font.BOLD, s.isOccupied() ? 12 : 13)); 
                 b.setForeground(Color.WHITE);
-                
                 b.setBackground(s.isOccupied() ? new Color(220, 53, 69) : new Color(40, 167, 69)); 
                 
-                b.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        String info = "Slot " + s.getId() + " | Type: " + s.getType()
-                            + " | Status: " + (s.isOccupied() ? "OCCUPIED" : "FREE");
-                        
-                        // Add vehicle info and price to the dialog
-                        if (s.isOccupied() && s.getVehicleNo() != null)
-                            info += "\nVehicle: " + s.getVehicleNo();
-                        info += "\nRate per hour: Rs " + (int)price;
+                b.addActionListener(e -> {
+                    String info = "Slot " + s.getId() + " | Type: " + s.getType()
+                        + " | Status: " + (s.isOccupied() ? "OCCUPIED" : "FREE");
+                    
+                    if (s.isOccupied() && s.getVehicleNo() != null) {
+                        info += "\nVehicle: " + s.getVehicleNo();
+                    }
+                    info += "\nRate per hour: Rs " + (int)price;
 
-                        if (s.isOccupied()) {
-                            int opt = showConfirm("Free slot S" + s.getId() + "? \n" + s.getVehicleNo());
-                            if (opt == 0) {
-                                s.free();
-                                buildGrid();
-                            }
-                        } else {
-                            showMessage(info);
+                    if (s.isOccupied()) {
+                        int opt = showConfirm("Free slot S" + s.getId() + "? \n" + s.getVehicleNo());
+                        if (opt == 0) {
+                            s.free();
+                            buildGrid();
                         }
+                    } else {
+                        showMessage(info);
                     }
                 });
                 grid.add(b);
             }
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             Label errorLbl = new Label("Parking Data Unavailable. Check SlotManager initialization.", Label.CENTER);
             errorLbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
             errorLbl.setForeground(new Color(183, 28, 28));
@@ -99,7 +89,7 @@ public class SlotPanel extends Panel {
         final int[] res = {1}; 
 
         Frame f = new Frame();
-        final Dialog d = new Dialog(f, "Confirm Action", true); 
+        Dialog d = new Dialog(f, "Confirm Action", true); 
         d.setLayout(new BorderLayout(15, 15));
         d.setBackground(new Color(255, 255, 255)); 
 
@@ -120,18 +110,14 @@ public class SlotPanel extends Panel {
         no.setForeground(Color.WHITE);
         no.setBackground(new Color(108, 117, 125)); 
 
-        yes.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                res[0] = 0;
-                d.dispose();
-            }
+        yes.addActionListener(e -> {
+            res[0] = 0;
+            d.dispose();
         });
 
-        no.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                res[0] = 1;
-                d.dispose();
-            }
+        no.addActionListener(e -> {
+            res[0] = 1;
+            d.dispose();
         });
 
         p.add(yes);
@@ -140,9 +126,7 @@ public class SlotPanel extends Panel {
 
         d.setSize(350,150);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screenSize.width - d.getWidth()) / 2;
-        int y = (screenSize.height - d.getHeight()) / 2;
-        d.setLocation(x, y);
+        d.setLocation((screenSize.width - d.getWidth()) / 2, (screenSize.height - d.getHeight()) / 2);
         d.setVisible(true);
 
         d.dispose();
@@ -152,7 +136,7 @@ public class SlotPanel extends Panel {
 
     private void showMessage(String msg) {
         Frame f = new Frame();
-        final Dialog d = new Dialog(f, "Slot Info", true); 
+        Dialog d = new Dialog(f, "Slot Info", true); 
         d.setLayout(new BorderLayout(15, 15));
         d.setBackground(new Color(255, 255, 255));
 
@@ -166,11 +150,7 @@ public class SlotPanel extends Panel {
         ok.setBackground(new Color(33, 150, 243)); 
         ok.setPreferredSize(new Dimension(80, 30));
 
-        ok.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                d.dispose();
-            }
-        });
+        ok.addActionListener(e -> d.dispose());
 
         Panel p = new Panel(new FlowLayout(FlowLayout.CENTER, 0, 10));
         p.setBackground(new Color(255, 255, 255));
@@ -179,9 +159,7 @@ public class SlotPanel extends Panel {
 
         d.setSize(380,150);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screenSize.width - d.getWidth()) / 2;
-        int y = (screenSize.height - d.getHeight()) / 2;
-        d.setLocation(x, y);
+        d.setLocation((screenSize.width - d.getWidth()) / 2, (screenSize.height - d.getHeight()) / 2);
         d.setVisible(true);
 
         d.dispose();
