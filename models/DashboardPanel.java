@@ -5,7 +5,6 @@ public class DashboardPanel extends Panel {
     private final ParkingApplet controller;
     private static final String FAILED_DATA = "N/A";
 
-    // Inner utility class for styled data cards
     class CardPanel extends Panel {
         public CardPanel(String title, String data, Color bg, ActionListener listener) {
             setLayout(new BorderLayout(5, 5));
@@ -25,7 +24,7 @@ public class DashboardPanel extends Panel {
 
             if (listener != null) {
                 Button invisibleBtn = new Button();
-                invisibleBtn.setPreferredSize(new Dimension(1,1));
+                invisibleBtn.setPreferredSize(new Dimension(1, 1));
                 add(invisibleBtn, BorderLayout.SOUTH);
                 invisibleBtn.addActionListener(listener);
             }
@@ -39,7 +38,6 @@ public class DashboardPanel extends Panel {
         repaint();
     }
     
-    // FIX: Constructor accepting the controller
     public DashboardPanel(ParkingApplet controller) {
         this.controller = controller;
         setLayout(new BorderLayout());
@@ -47,7 +45,6 @@ public class DashboardPanel extends Panel {
         buildUI();
     }
     
-    // Fallback constructor for safety if needed
     public DashboardPanel() {
         this(null);
     }
@@ -67,18 +64,9 @@ public class DashboardPanel extends Panel {
         gbc.insets = new Insets(20, 20, 20, 20);
         gbc.anchor = GridBagConstraints.CENTER;
 
-        // FIX: Wrap SlotManager calls in try-catch to prevent constructor failure
-        int totalSlots = 0; 
-        int occupiedSlots = 0;
-        double revenue = 0.0;
-        
-        try {
-             totalSlots = SlotManager.totalSlots(); 
-             occupiedSlots = SlotManager.occupiedSlots();
-             revenue = SlotManager.getRevenue();
-        } catch (NullPointerException e) {
-             // Data stays 0, handled gracefully below
-        }
+        int totalSlots = SlotManager.totalSlots(); 
+        int occupiedSlots = SlotManager.occupiedSlots();
+        double revenue = SlotManager.getRevenue();
 
         Panel statusCard = new CardPanel(
             "Available / Total Slots",
