@@ -1,13 +1,11 @@
 import java.awt.*;
-import java.awt.event.*;
 
 public class EntryPanel extends Panel {
-    private TextField vehicleField;
-    private Choice typeChoice;
-    private Button enterBtn;
+    private final TextField vehicleField;
+    private final Choice typeChoice;
+    private final Button enterBtn;
     private final ParkingApplet controller; 
 
-    // FIX: Constructor accepting the controller
     public EntryPanel(ParkingApplet controller) {
         this.controller = controller; 
 
@@ -61,37 +59,33 @@ public class EntryPanel extends Panel {
         c.anchor = GridBagConstraints.CENTER;
         add(buttonPanel, c);
 
-        enterBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String vno = vehicleField.getText().trim();
-                String type = typeChoice.getSelectedItem();
-                if (vno.isEmpty()) { showInfo("Enter vehicle number"); return; }
-                
-                SlotManager.seedSlots();
-                int slotId = SlotManager.findAndAssignSlot(type, vno); 
-        
-                if (slotId == -1) {
-                    showInfo("No free slot of type " + type);
-                } else {
-                    showInfo("Assigned Slot: S" + slotId + " for " + vno);
-                    vehicleField.setText("");
-                    
-                    if (controller != null) {
-                        controller.switchView("SLOTS"); // Switch to Slots to see the change
-                    }
+        enterBtn.addActionListener(e -> {
+            String vno = vehicleField.getText().trim();
+            String type = typeChoice.getSelectedItem();
+            if (vno.isEmpty()) { showInfo("Enter vehicle number"); return; }
+            
+            SlotManager.seedSlots();
+            int slotId = SlotManager.findAndAssignSlot(type, vno); 
+    
+            if (slotId == -1) {
+                showInfo("No free slot of type " + type);
+            } else {
+                showInfo("Assigned Slot: S" + slotId + " for " + vno);
+                vehicleField.setText("");
+                if (controller != null) {
+                    controller.switchView("SLOTS");
                 }
             }
         });
     }
     
-    // Fallback constructor
     public EntryPanel() {
         this(null);
     }
 
     private void showInfo(String msg) {
         Frame f = new Frame();
-        final Dialog d = new Dialog(f, "System Notification", true);
+        Dialog d = new Dialog(f, "System Notification", true);
         d.setLayout(new BorderLayout());
         d.setBackground(new Color(255, 255, 255));
 
@@ -108,25 +102,16 @@ public class EntryPanel extends Panel {
         ok.setBackground(new Color(76, 175, 80));
         ok.setForeground(Color.WHITE);
         ok.setPreferredSize(new Dimension(80, 30));
-
-        ok.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                d.dispose(); 
-            }
-        });
+        ok.addActionListener(e -> d.dispose());
+        
         Panel p = new Panel(new FlowLayout(FlowLayout.CENTER, 0, 10)); 
         p.add(ok);
         d.add(p, BorderLayout.SOUTH);
-        
         d.setSize(380, 150);
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (screenSize.width - d.getWidth()) / 2;
-        int y = (screenSize.height - d.getHeight()) / 2;
-        d.setLocation(x, y);
-        
+        d.setLocation((screenSize.width - d.getWidth()) / 2, (screenSize.height - d.getHeight()) / 2);
         d.setVisible(true); 
-        
         f.dispose();
     }
 }
