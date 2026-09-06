@@ -1,14 +1,12 @@
-// StaffPanel.java — Polished AWT UI, same functionality
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
+import java.util.List;
 
 public class StaffPanel extends Panel {
     private TextField nameField;
     private Button addBtn, removeBtn, refreshBtn, clearBtn;
-    private java.awt.List staffList; // interactive AWT List
+    private java.awt.List staffList; 
 
-    // colors / fonts
     private static final Color BG = new Color(250, 251, 252);
     private static final Color CARD = new Color(236, 246, 244);
     private static final Color ACCENT = new Color(6, 92, 92);
@@ -22,20 +20,16 @@ public class StaffPanel extends Panel {
         setBackground(BG);
         setFont(new Font("Dialog", Font.PLAIN, 12));
 
-        // top: title area
         add(buildHeader(), BorderLayout.NORTH);
 
-        // center: main content with list (left) and controls (right)
         Panel content = new Panel(new BorderLayout(10, 10));
         content.setBackground(BG);
         content.add(buildListCard(), BorderLayout.CENTER);
         content.add(buildControlsCard(), BorderLayout.EAST);
         add(content, BorderLayout.CENTER);
 
-        // bottom: small legend / tips
         add(buildFooter(), BorderLayout.SOUTH);
 
-        // initial population
         refreshStaffList();
     }
 
@@ -49,7 +43,6 @@ public class StaffPanel extends Panel {
         title.setAlignment(Label.LEFT);
         header.add(wrapWithPadding(title, 8), BorderLayout.WEST);
 
-        // subtitle
         Label sub = new Label("Add, remove or view staff members");
         sub.setFont(new Font("Dialog", Font.PLAIN, 12));
         sub.setForeground(Color.DARK_GRAY);
@@ -69,12 +62,9 @@ public class StaffPanel extends Panel {
         staffList.setBackground(Color.white);
         staffList.setForeground(Color.black);
 
-        // when user selects an item, put it into the input field
-        staffList.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                String sel = staffList.getSelectedItem();
-                if (sel != null) nameField.setText(sel);
-            }
+        staffList.addItemListener(e -> {
+            String sel = staffList.getSelectedItem();
+            if (sel != null) nameField.setText(sel);
         });
 
         Panel listWrap = new Panel(new BorderLayout());
@@ -101,7 +91,6 @@ public class StaffPanel extends Panel {
         Panel controls = new Panel(new GridLayout(6, 1, 8, 8));
         controls.setBackground(BG);
 
-        // input row
         Panel inputRow = new Panel(new FlowLayout(FlowLayout.LEFT, 6, 6));
         inputRow.setBackground(BG);
         Label nameLbl = new Label("Name:");
@@ -112,7 +101,6 @@ public class StaffPanel extends Panel {
         inputRow.add(nameLbl);
         inputRow.add(nameField);
 
-        // buttons
         addBtn = styledButton("Add");
         removeBtn = styledButton("Remove Selected");
         refreshBtn = styledButton("Refresh List");
@@ -124,54 +112,42 @@ public class StaffPanel extends Panel {
         controls.add(refreshBtn);
         controls.add(clearBtn);
 
-        // small spacer to balance layout
-        controls.add(new Panel() {{ setBackground(BG); }});
+        Panel spacer = new Panel();
+        spacer.setBackground(BG);
+        controls.add(spacer);
 
         card.add(controls, BorderLayout.NORTH);
 
-        // wire actions
-        addBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String nm = nameField.getText().trim();
-                if (nm.isEmpty()) {
-                    showInfo("Please enter a staff name.");
-                    return;
-                }
-                SlotManager.addStaff(nm);
-                nameField.setText("");
+        addBtn.addActionListener(e -> {
+            String nm = nameField.getText().trim();
+            if (nm.isEmpty()) {
+                showInfo("Please enter a staff name.");
+                return;
+            }
+            SlotManager.addStaff(nm);
+            nameField.setText("");
+            refreshStaffList();
+            showInfo("Added: " + nm);
+        });
+
+        removeBtn.addActionListener(e -> {
+            String sel = staffList.getSelectedItem();
+            if (sel == null) {
+                showInfo("Please select a staff member to remove.");
+                return;
+            }
+            boolean ok = SlotManager.removeStaff(sel);
+            if (ok) {
                 refreshStaffList();
-                showInfo("Added: " + nm);
+                showInfo("Removed: " + sel);
+            } else {
+                showInfo("Could not remove: " + sel);
             }
         });
 
-        removeBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String sel = staffList.getSelectedItem();
-                if (sel == null) {
-                    showInfo("Please select a staff member to remove.");
-                    return;
-                }
-                boolean ok = SlotManager.removeStaff(sel);
-                if (ok) {
-                    refreshStaffList();
-                    showInfo("Removed: " + sel);
-                } else {
-                    showInfo("Could not remove: " + sel);
-                }
-            }
-        });
+        refreshBtn.addActionListener(e -> refreshStaffList());
 
-        refreshBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                refreshStaffList();
-            }
-        });
-
-        clearBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                nameField.setText("");
-            }
-        });
+        clearBtn.addActionListener(e -> nameField.setText(""));
 
         return wrapWithMargin(card, 6);
     }
@@ -186,7 +162,6 @@ public class StaffPanel extends Panel {
         return wrapWithPadding(footer, 6);
     }
 
-    // Helper: styled button
     private Button styledButton(String text) {
         Button b = new Button(text);
         b.setFont(BTN_FONT);
@@ -195,17 +170,15 @@ public class StaffPanel extends Panel {
         return b;
     }
 
-    // Refresh the AWT List from SlotManager
     private void refreshStaffList() {
         staffList.removeAll();
-        ArrayList<String> st = SlotManager.getStaffList();
+        List<String> st = SlotManager.getStaffList();
         for (String s : st) staffList.add(s);
     }
 
-    // Info dialog helper (uses final Dialog so inner classes can access it)
     private void showInfo(String msg) {
         Frame f = new Frame();
-        final Dialog d = new Dialog(f, "Staff", true);
+        Dialog d = new Dialog(f, "Staff", true);
         d.setLayout(new BorderLayout(8, 8));
 
         TextArea ta = new TextArea(msg, 6, 40, TextArea.SCROLLBARS_VERTICAL_ONLY);
@@ -219,11 +192,7 @@ public class StaffPanel extends Panel {
         Button ok = new Button("OK");
         ok.setBackground(BTN_BG);
         ok.setForeground(Color.white);
-        ok.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                d.setVisible(false);
-            }
-        });
+        ok.addActionListener(e -> d.dispose());
         p.add(ok);
         d.add(wrapWithPadding(p, 6), BorderLayout.SOUTH);
 
@@ -234,7 +203,6 @@ public class StaffPanel extends Panel {
         f.dispose();
     }
 
-    // Small layout helpers to add uniform padding/margins
     private Panel wrapWithPadding(Component c, int pad) {
         Panel p = new Panel(new BorderLayout());
         p.setBackground(BG);
@@ -253,7 +221,7 @@ public class StaffPanel extends Panel {
     private Panel wrapWithMargin(Component c, int margin) {
         Panel outer = new Panel(new BorderLayout());
         outer.setBackground(BG);
-        outer.add(wrapWithPadding((Component) c, margin), BorderLayout.CENTER);
+        outer.add(wrapWithPadding(c, margin), BorderLayout.CENTER);
         return outer;
     }
 }
